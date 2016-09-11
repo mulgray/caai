@@ -1,0 +1,20 @@
+{
+  "name": "caai",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "./build.sh",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mulgray/caai.git"
+  },
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "nan": "^2.4.0",
+    "node-gyp": "^3.4.0"
+  }
+}

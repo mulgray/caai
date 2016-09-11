@@ -1,3 +1,7 @@
 *~
 *.out
+
 /abema/build
+
+/client/node_modules
+/client/build
