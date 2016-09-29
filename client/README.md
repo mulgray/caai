@@ -7,11 +7,11 @@ CAAI クライアント
 ```
 $ npm install --global electron
 $ npm install
-$ npm run build
+$ npm build
 ```
 
 ## Run
 
 ```
-$ npm run start
+$ npm start
 ```
