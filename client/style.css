@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 html, body {
@@ -22,4 +23,69 @@ html, body {
 .center-box {
   border-radius: 80px;
   overflow: hidden;
+}
+
+.dialog-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-dialog {
+  background-color: white;
+  width: 600px;
+  height: 400px;
+  border-radius: 3px;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-dialog input {
+  width: 100%;
+  padding: 10px;
+  font-size: 30px;
+}
+
+.input-dialog input-column {
+  width: 100%;
+}
+
+.input-dialog button {
+  width: 100px;
+  height: 30px;
+  margin: 20px;
+
+  border: 0;
+  border-radius: 2px;
+
+  background-color: green;
+}
+
+.md-effect-1 .md-content {
+	-webkit-transform: scale(0.7);
+	-moz-transform: scale(0.7);
+	-ms-transform: scale(0.7);
+	transform: scale(0.7);
+	opacity: 0;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.md-show.md-effect-1 .md-content {
+	-webkit-transform: scale(1);
+	-moz-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+	opacity: 1;
 }
