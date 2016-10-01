@@ -4,16 +4,20 @@
     <meta charset="utf-8">
     <title>AbemaFace</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Baloo" rel="stylesheet">
   </head>
   <body>
     <div class="contents">
       <div class="center-box">
-        <canvas id="video" width="800" height="600"></canvas>
+        <canvas id="video" width="1000" height="700"></canvas>
       </div>
     </div>
-    <div class="dialog-wrapper">
+    <div class="title-box">
+      <h1>Abema Card Maker</h1>
+    </div>
+    <div class="dialog-wrapper" id="dialog">
       <div class="input-dialog">
-        <h2>入力</h2>
+        <h2>Input your info!</h2>
         <div class="input-column">
           <label>
             氏名
@@ -27,7 +31,7 @@
           <input id="affiliate-input">
         </div>
         <div class="input-column">
-          <button type="submit" id="crate-button">
+          <button type="submit" id="create-button">
             作成
           </button>
         </div>
