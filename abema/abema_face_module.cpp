@@ -46,6 +46,8 @@ private:
   cv::VideoCapture cap;
   cv::Mat abema_source;
 
+  cv::Mat result_image;
+
 public:
   void init() {
     detector = get_frontal_face_detector();
@@ -115,6 +117,22 @@ public:
                      cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
 
       temp += alpha;
+
+      // make face image
+      int min_x = 9999;
+      int min_y = 9999;
+      int max_x = 0;
+      int max_y = 0;
+      for (int i = 0; i < shapes[0].num_parts(); i++) {
+        const full_object_detection& d = shapes[0];
+        x = d.part(i).x();
+        y = d.part(i).y();
+        if (x < min_x) min_x = x;
+        if (y < min_y) min_y = y;
+        if (x > max_x) max_x = x;
+        if (y > max_y) max_y = y;
+      }
+      result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
     }
 
     // resize output
@@ -133,13 +151,17 @@ public:
       }
     }
   }
+
+  void save(std::string filename) {
+    cv::imwrite(filename, result_image);
+  }
 };
 
 // export as node module
 
 AbemaFace abema_face;
 
-void Method(const Nan::FunctionCallbackInfo<Value>& args) {
+void draw(const Nan::FunctionCallbackInfo<Value>& args) {
   Local<Uint8ClampedArray> array = args[0].As<Uint8ClampedArray>();
   unsigned char* ptr = (unsigned char*)array->Buffer()->GetContents().Data();
   int width = args[1]->NumberValue();
@@ -147,11 +169,19 @@ void Method(const Nan::FunctionCallbackInfo<Value>& args) {
   abema_face.draw(ptr, width, height);
 }
 
+void save(const Nan::FunctionCallbackInfo<Value>& args) {
+  v8::String::Utf8Value str(args[0]->ToString());
+  char *cstr = *str;
+  abema_face.save(std::string(cstr));
+}
+
 void init(Local<Object> exports) {
   abema_face.init();
 
   exports->Set(Nan::New("draw").ToLocalChecked(),
-               Nan::New<v8::FunctionTemplate>(Method)->GetFunction());
+               Nan::New<v8::FunctionTemplate>(draw)->GetFunction());
+  exports->Set(Nan::New("save").ToLocalChecked(),
+               Nan::New<v8::FunctionTemplate>(save)->GetFunction());
   // NODE_SET_METHOD(exports, "draw", Method);
 }
 
