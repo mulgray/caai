@@ -82,6 +82,8 @@ int main()
             for (unsigned long i = 0; i < faces.size(); ++i)
                 shapes.push_back(pose_model(cimg, faces[i]));
 
+            if (shapes.size() == 0) continue;
+
             // Display it all on the screen
             win.clear_overlay();
             for (unsigned long i = 0; i < shapes.size(); ++i) {
