@@ -1,6 +1,7 @@
 var abema_face = require('./build/Release/abema_face');
 var $ = require('jquery');
 var fs = require('fs');
+var exec = require('child_process').exec;
 
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('video');
@@ -12,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var update = function() {
     abema_face.draw(imageData.data, width, height);
     context.putImageData(imageData, 0, 0);
-    setTimeout(update, 100);
+    setTimeout(update, 1);
   };
   update();
 
@@ -24,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('#create-button').click(() => {
     abema_face.save('abema.png');
+    exec('python test.py', (error, stdout, stderr) => {
+      alert(stdout);
+    });
   });
 });
 
