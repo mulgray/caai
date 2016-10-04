@@ -44,20 +44,25 @@ private:
   frontal_face_detector detector;
   shape_predictor pose_model;
   cv::VideoCapture cap;
+
   cv::Mat abema_source;
+  cv::Mat abema_head;
 
   cv::Mat result_image;
+
+  double ave_r = 0;
 
 public:
   void init() {
     detector = get_frontal_face_detector();
-    cap = cv::VideoCapture(0);
+    cap = cv::VideoCapture(1);
     if (!cap.isOpened()) {
       cerr << "Unable to connect to camera" << endl;
       return;
     }
     deserialize("assets/shape_predictor_68_face_landmarks.dat") >> pose_model;
     abema_source = cv::imread("assets/abema-nose.png", -1);
+    abema_head = cv::imread("assets/abema-head.png", -1);
   }
 
   void draw(unsigned char* array, int width, int height) {
@@ -81,6 +86,10 @@ public:
       int y = 0;
       double r = 0;
       double z = 0;
+      int brow_left_x = 0;
+      int brow_left_y = 0;
+      int brow_right_x = 0;
+      int brow_right_y = 0;
       for (unsigned long i = 0; i < shapes.size(); ++i) {
         const full_object_detection& d = shapes[0];
         // x, y: position of a nose
@@ -88,51 +97,138 @@ public:
         x = d.part(30).x();
         y = d.part(30).y();
         z = (d.part(16).x() - d.part(1).x()) / 600.0;
-        r = (d.part(30).x() - d.part(28).x()) * 3.14;
+        double _r = (d.part(30).x() - d.part(28).x()) * 3.14;
+        ave_r = (ave_r + _r) / 2;
+        r = ave_r;
+        std::cout << d.part(30).x() - d.part(28).x() << std::endl;
+
+        brow_left_x = d.part(20).x();
+        brow_left_y = d.part(20).y();
+        brow_right_x = d.part(25).x();
+        brow_right_y = d.part(25).y();
+      }
+      // std::cout << "x = " << x << std::endl;
+      // std::cout << "y = " << y << std::endl;
+      // std::cout << "z = " << z << std::endl;
+      // std::cout << "r = " << r << std::endl;
+      // std::cout << "blx = " << brow_left_x << std::endl;
+      // std::cout << "bly = " << brow_left_y << std::endl;
+      // std::cout << "brx = " << brow_right_x << std::endl;
+      // std::cout << "bry = " << brow_right_y << std::endl;
+
+      {
+        cv::Mat abema_resized;
+        cv::resize(abema_source, abema_resized, cv::Size(), z, z);
+        cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
+        cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
+        mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
+        mv.at<double>(1, 2) += y - (abema_resized.rows / 2);
+
+        std::vector<cv::Mat> abemalpha;
+        cv::split(abema_resized, abemalpha);
+        cv::Mat alpha32f, abealpha;
+        abemalpha[3].convertTo(alpha32f, CV_8UC1);
+        cv::normalize(alpha32f, alpha32f, 0.0f, 1.0f, cv::NORM_MINMAX);
+        cv::cvtColor(alpha32f, abealpha, CV_GRAY2BGR, 3);
+
+        std::vector<cv::Mat> overlay =
+          {abemalpha[0], abemalpha[1], abemalpha[2]};
+        cv::Mat overlayTmp, overlay32fc3;
+        cv::merge(overlay, overlayTmp);
+        overlayTmp.convertTo(overlay32fc3, CV_8UC3);
+
+        cv::Mat alpha(cv::Size(temp.cols, temp.rows), CV_8UC3,
+                      cv::Scalar(0, 0, 0));
+        cv::warpAffine(overlay32fc3.mul(abealpha), alpha, mv, alpha.size(),
+                       cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+        temp += alpha;
       }
 
-      cv::Mat abema_resized;
-      cv::resize(abema_source, abema_resized, cv::Size(), z, z);
-      cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
-      cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
-      mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
-      mv.at<double>(1, 2) += y - (abema_resized.rows / 2);
+      {
+        cv::Mat abema_resized;
+        cv::resize(abema_head, abema_resized, cv::Size(), z / 2.0, z / 2.0);
+        cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
+        cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
+        mv.at<double>(0, 2) += (brow_left_x + brow_right_x) / 2 - (abema_resized.cols / 2);
+        mv.at<double>(1, 2) += (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
 
-      std::vector<cv::Mat> abemalpha;
-      cv::split(abema_resized, abemalpha);
-      cv::Mat alpha32f, abealpha;
-      abemalpha[3].convertTo(alpha32f, CV_8UC1);
-      cv::normalize(alpha32f, alpha32f, 0.0f, 1.0f, cv::NORM_MINMAX);
-      cv::cvtColor(alpha32f, abealpha, CV_GRAY2BGR, 3);
+        cv::Mat alpha(cv::Size(temp.cols, temp.rows), alpha.type(), cv::Scalar(0, 0, 0));
+        cv::warpAffine(abema_resized,
+                       alpha,
+                       mv,
+                       alpha.size(),
+                       cv::INTER_LINEAR,
+                       cv::BORDER_TRANSPARENT);
 
-      std::vector<cv::Mat> overlay =
-        {abemalpha[0], abemalpha[1], abemalpha[2]};
-      cv::Mat overlayTmp, overlay32fc3;
-      cv::merge(overlay, overlayTmp);
-      overlayTmp.convertTo(overlay32fc3, CV_8UC3);
+        std::vector<cv::Mat> channels;
+        cv::split(alpha, channels);
 
-      cv::Mat alpha(cv::Size(temp.cols, temp.rows), CV_8UC3,
-                    cv::Scalar(0, 0, 0));
-      cv::warpAffine(overlay32fc3.mul(abealpha), alpha, mv, alpha.size(),
-                     cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+        cv::normalize(channels[3], channels[3], 0.0f, 1.0f, cv::NORM_MINMAX);
+        std::vector<cv::Mat> alphaChannels = {
+          channels[3],
+          channels[3],
+          channels[3]
+        };
+        cv::Mat alphaChannel, ab;
+        cv::merge(alphaChannels, alphaChannel);
+        alphaChannel.convertTo(ab, temp.type());
 
-      temp += alpha;
+        std::vector<cv::Mat> overlay =
+          {channels[0], channels[1], channels[2]};
+        cv::Mat overlayTmp, overlay32fc3;
+        cv::merge(overlay, overlayTmp);
+        overlayTmp.convertTo(overlay32fc3, temp.type());
+
+        temp = temp.mul(cv::Scalar::all(1) - alphaChannel) + overlayTmp.mul(alphaChannel);
+      }
+
+      if (0) {
+        cv::Mat abema_resized;
+        cv::resize(abema_head, abema_resized, cv::Size(), z * 4, z * 4);
+        cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
+        cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
+        mv.at<double>(0, 2) += (brow_left_x + brow_right_x) / 2 - (abema_resized.cols / 2);
+        mv.at<double>(1, 2) += (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
+
+        std::vector<cv::Mat> abemalpha;
+        cv::split(abema_resized, abemalpha);
+        cv::Mat alpha32f, abealpha;
+        abemalpha[3].convertTo(alpha32f, CV_8UC1);
+        cv::normalize(alpha32f, alpha32f, 0.0f, 1.0f, cv::NORM_MINMAX);
+        cv::cvtColor(alpha32f, abealpha, CV_GRAY2BGR, 3);
+
+        std::vector<cv::Mat> overlay =
+          {abemalpha[0], abemalpha[1], abemalpha[2]};
+        cv::Mat overlayTmp, overlay32fc3;
+        cv::merge(overlay, overlayTmp);
+        overlayTmp.convertTo(overlay32fc3, temp.type());
+
+        cv::Mat alpha(cv::Size(temp.cols, temp.rows), CV_8UC3,
+                      cv::Scalar(0, 0, 0));
+        cv::warpAffine(overlay32fc3.mul(abealpha), alpha, mv, alpha.size(),
+                       cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+
+        // std::cout << "_as " << alpha.size() << std::endl;
+        // std::cout << "_ts " << temp.size() << std::endl;
+        // std::cout << "_mv " << mv << std::endl;
+        temp = (temp + alpha);
+      }
 
       // make face image
-      int min_x = 9999;
-      int min_y = 9999;
-      int max_x = 0;
-      int max_y = 0;
-      for (int i = 0; i < shapes[0].num_parts(); i++) {
-        const full_object_detection& d = shapes[0];
-        x = d.part(i).x();
-        y = d.part(i).y();
-        if (x < min_x) min_x = x;
-        if (y < min_y) min_y = y;
-        if (x > max_x) max_x = x;
-        if (y > max_y) max_y = y;
-      }
-      result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
+      // int min_x = 9999;
+      // int min_y = 9999;
+      // int max_x = 0;
+      // int max_y = 0;
+      // for (int i = 0; i < shapes[0].num_parts(); i++) {
+      //   const full_object_detection& d = shapes[0];
+      //   x = d.part(i).x();
+      //   y = d.part(i).y();
+      //   if (x < min_x) min_x = x;
+      //   if (y < min_y) min_y = y;
+      //   if (x > max_x) max_x = x;
+      //   if (y > max_y) max_y = y;
+      // }
+      // result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
     }
 
     // resize output
