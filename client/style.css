@@ -59,6 +59,7 @@ h1, h2 {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 200;
 }
 
 .input-dialog {
@@ -119,4 +120,30 @@ h1, h2 {
 #dialog.shown .input-dialog {
 	transform: scale(1);
 	opacity: 1;
+}
+
+.countdown-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+	transition: all 0.3s;
+
+  z-index: 100;
+}
+
+.countdown-wrapper .flush {
+  background-color: white;
+	opacity: 1;
+}
+
+.countdown {
+  color: white;
+  font-size: 50px;
 }
