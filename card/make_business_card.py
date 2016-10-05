@@ -48,7 +48,7 @@ for i in range(len(description)):
     y += dy
     draw.text((165 * 4.727, y), description[i], font=font2, fill='black')
 
-input_img = Image.open('dist.png', 'r')
+input_img = Image.open('../client/abema.png', 'r')
 
 canvas.paste(input_img, (int(43 * 4.727), int(250 * 4.727)))
 

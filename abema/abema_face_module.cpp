@@ -139,27 +139,16 @@ public:
                    (brow_left_x + brow_right_x) / 2,
                    (brow_left_y + brow_right_y) / 2,
                    z / 2.0, r);
-      }
 
-      // make face image
-      int min_x = 9999;
-      int min_y = draw_size_top;
-      int max_x = 0;
-      int max_y = 0;
-      for (int i = 0; i < shapes[0].num_parts(); i++) {
-        const full_object_detection& d = shapes[0];
-        x = d.part(i).x();
-        y = d.part(i).y();
-        if (x < min_x) min_x = x;
-        if (y < min_y) min_y = y;
-        if (x > max_x) max_x = x;
-        if (y > max_y) max_y = y;
+        // crop face around area
+        double crop_size = 1800 * z;
+        cv::Rect crop_rect(x - crop_size / 2,
+                           y - crop_size / 2 - crop_size / 3,
+                           crop_size, crop_size);
+        cv::Rect bounds(0, 0, temp.size().width, temp.size().height);
+        result_image = cv::Mat(temp, (crop_rect & bounds));
+        cv::resize(result_image, result_image, cv::Size(900, 900), cv::INTER_CUBIC);
       }
-      if (min_x < 0) min_x = 0;
-      if (min_y < 0) min_y = 0;
-      if (max_x >= temp.cols) max_x = temp.cols;
-      if (max_y >= temp.rows) max_y = temp.rows;
-      result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
     }
 
     // resize output
