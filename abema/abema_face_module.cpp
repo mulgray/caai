@@ -53,6 +53,39 @@ private:
   cv::Mat result_image;
 
   double ave_r = 0;
+  int draw_size_top = 0;
+
+  void blend_nose(cv::Mat screen, int x , int y, double scale, double rotation) {
+    cv::Mat abema_resized;
+    cv::resize(abema_source, abema_resized, cv::Size(), scale, scale);
+
+    cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1.0);
+    mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
+    mv.at<double>(1, 2) += y - (abema_resized.rows / 2);
+
+    cv::Mat nose_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
+    cv::warpAffine(abema_resized, nose_screen, mv, nose_screen.size(),
+                   cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+
+    ImageUtils::blend(nose_screen, screen);
+  }
+
+  void blend_head(cv::Mat screen, int x , int y, double scale, double rotation) {
+    cv::Mat abema_resized;
+    cv::resize(abema_head, abema_resized, cv::Size(), scale, scale);
+    cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1.0);
+    mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
+    mv.at<double>(1, 2) += y - (abema_resized.rows);
+
+    cv::Mat head_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
+    cv::warpAffine(abema_resized, head_screen, mv, head_screen.size(),
+                   cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+    draw_size_top = x - (abema_resized.cols / 2);
+
+    ImageUtils::blend(head_screen, screen);
+  }
 
 public:
   void init() {
@@ -69,7 +102,6 @@ public:
 
   void draw(unsigned char* array, int width, int height) {
     cv::Mat temp;
-    int draw_size_top = 0;
 
     cap >> temp;
     cv::flip(temp, temp, 1);
@@ -85,66 +117,28 @@ public:
     }
 
     if (shapes.size() > 0) {
-      int x = 0;
-      int y = 0;
-      double r = 0;
-      double z = 0;
-      int brow_left_x = 0;
-      int brow_left_y = 0;
-      int brow_right_x = 0;
-      int brow_right_y = 0;
       for (unsigned long i = 0; i < shapes.size(); ++i) {
         const full_object_detection& d = shapes[0];
         // x, y: position of a nose
         // z: projected ear to ear distance of the face
-        x = d.part(30).x();
-        y = d.part(30).y();
-        z = (d.part(16).x() - d.part(1).x()) / 600.0;
+        int x = d.part(30).x();
+        int y = d.part(30).y();
+        double z = (d.part(16).x() - d.part(1).x()) / 600.0;
         double _r = (d.part(30).x() - d.part(28).x()) * 3.14;
         ave_r = (ave_r + _r) / 2;
-        r = ave_r;
+        double r = ave_r;
         std::cout << d.part(30).x() - d.part(28).x() << std::endl;
 
-        brow_left_x = d.part(20).x();
-        brow_left_y = d.part(20).y();
-        brow_right_x = d.part(25).x();
-        brow_right_y = d.part(25).y();
-      }
+        int brow_left_x = d.part(20).x();
+        int brow_left_y = d.part(20).y();
+        int brow_right_x = d.part(25).x();
+        int brow_right_y = d.part(25).y();
 
-      {
-        cv::Mat abema_resized;
-        cv::resize(abema_source, abema_resized, cv::Size(), z, z);
-        cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
-        cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
-        mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
-        mv.at<double>(1, 2) += y - (abema_resized.rows / 2);
-
-        cv::Mat nose_screen(temp.size(), temp.type(), cv::Scalar(0, 0, 0));
-        cv::warpAffine(abema_resized, nose_screen, mv, nose_screen.size(),
-                       cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
-
-        ImageUtils::blend(nose_screen, temp);
-      }
-
-      {
-        cv::Mat abema_resized;
-        cv::resize(abema_head, abema_resized, cv::Size(), z / 2.0, z / 2.0);
-        cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
-        cv::Mat mv = cv::getRotationMatrix2D(ctr, r, 1.0);
-        mv.at<double>(0, 2) += (brow_left_x + brow_right_x) / 2 - (abema_resized.cols / 2);
-        mv.at<double>(1, 2) += (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
-
-        draw_size_top = (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
-
-        cv::Mat head_screen(temp.size(), temp.type(), cv::Scalar(0, 0, 0));
-        cv::warpAffine(abema_resized,
-                       head_screen,
-                       mv,
-                       head_screen.size(),
-                       cv::INTER_LINEAR,
-                       cv::BORDER_TRANSPARENT);
-
-        ImageUtils::blend(head_screen, temp);
+        blend_nose(temp, x, y, z, r);
+        blend_head(temp,
+                   (brow_left_x + brow_right_x) / 2,
+                   (brow_left_y + brow_right_y) / 2,
+                   z / 2.0, r);
       }
 
       // make face image
