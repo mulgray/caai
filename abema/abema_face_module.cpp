@@ -67,6 +67,7 @@ public:
 
   void draw(unsigned char* array, int width, int height) {
     cv::Mat temp;
+    int draw_size_top = 0;
 
     cap >> temp;
     cv::flip(temp, temp, 1);
@@ -152,6 +153,8 @@ public:
         mv.at<double>(0, 2) += (brow_left_x + brow_right_x) / 2 - (abema_resized.cols / 2);
         mv.at<double>(1, 2) += (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
 
+        draw_size_top = (brow_left_y + brow_right_y) / 2 - (abema_resized.rows);
+
         cv::Mat alpha(cv::Size(temp.cols, temp.rows), alpha.type(), cv::Scalar(0, 0, 0));
         cv::warpAffine(abema_resized,
                        alpha,
@@ -216,7 +219,7 @@ public:
 
       // make face image
       int min_x = 9999;
-      int min_y = 9999;
+      int min_y = draw_size_top;
       int max_x = 0;
       int max_y = 0;
       for (int i = 0; i < shapes[0].num_parts(); i++) {
