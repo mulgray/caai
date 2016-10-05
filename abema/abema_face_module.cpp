@@ -141,13 +141,17 @@ public:
                    z / 2.0, r);
 
         // crop face around area
-        double crop_size = 1800 * z;
+        double crop_size = 1200 * z;
         cv::Rect crop_rect(x - crop_size / 2,
                            y - crop_size / 2 - crop_size / 3,
                            crop_size, crop_size);
         cv::Rect bounds(0, 0, temp.size().width, temp.size().height);
-        result_image = cv::Mat(temp, (crop_rect & bounds));
+        crop_rect = crop_rect & bounds;
+        result_image = cv::Mat(temp, crop_rect);
         cv::resize(result_image, result_image, cv::Size(900, 900), cv::INTER_CUBIC);
+
+        // draw crop rectangle
+        cv::rectangle(temp, crop_rect.tl(), crop_rect.br(), cv::Scalar(255, 0, 0), 10);
       }
     }
 
