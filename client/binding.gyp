@@ -16,7 +16,10 @@
           "-ldlib",
           "<!@(pkg-config --libs opencv)",
         ]
-      }
+      },
+      "defines": [
+        'DLIB_NO_GUI_SUPPORT'
+      ]
     }
   ]
 }
