@@ -215,20 +215,25 @@ public:
       }
 
       // make face image
-      // int min_x = 9999;
-      // int min_y = 9999;
-      // int max_x = 0;
-      // int max_y = 0;
-      // for (int i = 0; i < shapes[0].num_parts(); i++) {
-      //   const full_object_detection& d = shapes[0];
-      //   x = d.part(i).x();
-      //   y = d.part(i).y();
-      //   if (x < min_x) min_x = x;
-      //   if (y < min_y) min_y = y;
-      //   if (x > max_x) max_x = x;
-      //   if (y > max_y) max_y = y;
-      // }
-      // result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
+      int min_x = 9999;
+      int min_y = 9999;
+      int max_x = 0;
+      int max_y = 0;
+      for (int i = 0; i < shapes[0].num_parts(); i++) {
+        const full_object_detection& d = shapes[0];
+        x = d.part(i).x();
+        y = d.part(i).y();
+        if (x < min_x) min_x = x;
+        if (y < min_y) min_y = y;
+        if (x > max_x) max_x = x;
+        if (y > max_y) max_y = y;
+      }
+      if (min_x < 0) min_x = 0;
+      if (min_y < 0) min_y = 0;
+      if (max_x >= temp.cols) min_x = temp.cols;
+      if (max_y >= temp.rows) min_y = temp.rows;
+      std::cout << min_x << ", " << min_y << ", " << max_x << ", " << max_y << ", " << std::endl;
+      result_image = cv::Mat(temp, cv::Rect(min_x, min_y, max_x - min_x, max_y - min_y));
     }
 
     // resize output
