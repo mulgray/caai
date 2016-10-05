@@ -77,7 +77,7 @@ private:
     cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
     cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1.0);
     mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
-    mv.at<double>(1, 2) += y - (abema_resized.rows);
+    mv.at<double>(1, 2) += y - (abema_resized.rows / 1.25);
 
     cv::Mat head_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
     cv::warpAffine(abema_resized, head_screen, mv, head_screen.size(),
