@@ -10,6 +10,7 @@ function countdown() {
   var count = 3;
   var decrement = () => {
     if (count == 0) {
+      elem.text();
       abema_face.save('abema.png');
       $('#dialog').toggleClass('shown');
     } else {
@@ -42,8 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   $('#create-button').click(() => {
-    exec('python test.py', (error, stdout, stderr) => {
-      alert(stdout);
+    name = $('#name-input').val();
+    affiliate = $('#affiliate-input').val();
+    args = name + ' ' + name + ' ' + affiliate;
+
+    exec('python ../card/make_business_card.py ' + args, (error, stdout, stderr) => {
+      $('#dialog').toggleClass('shown');
     });
   });
 });

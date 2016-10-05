@@ -1,5 +1,6 @@
 # --- coding: utf-8 ---
 from PIL import Image, ImageDraw, ImageFont
+import os
 import sys
 
 """Usage this file.
@@ -16,13 +17,16 @@ if len(sys.argv) < 4: # 引数が足りない
     print("The argument is insufficient, so program will exit.")
     sys.exit(1)
 
+def abs_path(filepath):
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filepath)
+
 # 画像オブジェクト作成
 canvas = Image.new('RGB', (1300, 2150), (255, 255, 255))
 draw = ImageDraw.Draw(canvas)
 
 # フォントの種類とサイズを指定
-font = ImageFont.truetype('fonts/hiragino.otf', int(25 * 4.727))
-font2 = ImageFont.truetype('fonts/hiragino.otf', int(8 * 4.727))
+font = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(25 * 4.727))
+font2 = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(8 * 4.727))
 
 familyName = sys.argv[1]
 firstName = sys.argv[2]
@@ -48,9 +52,10 @@ for i in range(len(description)):
     y += dy
     draw.text((165 * 4.727, y), description[i], font=font2, fill='black')
 
-input_img = Image.open('../client/abema.png', 'r')
+input_img = Image.open(abs_path('../client/abema.png'), 'r')
 
 canvas.paste(input_img, (int(43 * 4.727), int(250 * 4.727)))
 
 canvas_rotate = canvas.transpose(Image.ROTATE_90)
-canvas_rotate.save('img_out_rotate.jpg', 'JPEG', quality=100, optimize=True)
+canvas_rotate.save(abs_path('img_out_rotate.jpg'), 'JPEG', quality=100, optimize=True)
+
