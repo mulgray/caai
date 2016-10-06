@@ -84,7 +84,7 @@ private:
 public:
   void init() {
     detector = get_frontal_face_detector();
-    cap = cv::VideoCapture(0);
+    cap = cv::VideoCapture(1);
     if (!cap.isOpened()) {
       cerr << "Unable to connect to camera" << endl;
       return;
