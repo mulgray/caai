@@ -14,7 +14,9 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "animate.css": "^3.5.2",
     "data-uri-to-buffer": "0.0.4",
+    "font-awesome": "^4.6.3",
     "jquery": "^3.1.1",
     "nan": "^2.4.0",
     "node-gyp": "^3.4.0"

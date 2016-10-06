@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 #include <node.h>
 #include <v8.h>
@@ -56,26 +57,31 @@ private:
   int draw_size_top = 0;
 
   void blend_nose(cv::Mat screen, int x , int y, double scale, double rotation) {
-    cv::Point2d ctr(abema_source.cols * scale / 2, abema_source.rows * scale / 2);
-    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, scale);
-    mv.at<double>(0, 2) += x - abema_source.cols * scale;
-    mv.at<double>(1, 2) += y - abema_source.rows * scale;
+    cv::Mat abema_scaled;
+    cv::resize(abema_source, abema_scaled, cv::Size(), scale, scale, cv::INTER_CUBIC);
+    cv::Point2d ctr(abema_scaled.cols / 2, abema_scaled.rows / 2);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1);
+    mv.at<double>(0, 2) += x - abema_scaled.cols / 2;
+    mv.at<double>(1, 2) += y - abema_scaled.rows / 2;
 
     cv::Mat nose_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
-    cv::warpAffine(abema_source, nose_screen, mv, nose_screen.size(),
+    cv::warpAffine(abema_scaled, nose_screen, mv, nose_screen.size(),
                    cv::INTER_CUBIC, cv::BORDER_TRANSPARENT);
 
     ImageUtils::blend(nose_screen, screen);
   }
 
   void blend_head(cv::Mat screen, int x , int y, double scale, double rotation) {
-    cv::Point2d ctr(abema_head.cols * scale / 2, abema_head.rows * scale / 2);
-    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, scale);
-    mv.at<double>(0, 2) += x - abema_head.cols * scale;
-    mv.at<double>(1, 2) += y - abema_head.rows * scale * 1.25;
+    cv::Mat abema_scaled;
+    cv::resize(abema_head, abema_scaled, cv::Size(), scale, scale, cv::INTER_CUBIC);
+
+    cv::Point2d ctr(abema_scaled.cols / 2, abema_scaled.rows);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1);
+    mv.at<double>(0, 2) += x - abema_scaled.cols / 2;
+    mv.at<double>(1, 2) += y - abema_scaled.rows / 1.25;
 
     cv::Mat head_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
-    cv::warpAffine(abema_head, head_screen, mv, head_screen.size(),
+    cv::warpAffine(abema_scaled, head_screen, mv, head_screen.size(),
                    cv::INTER_CUBIC, cv::BORDER_TRANSPARENT);
 
     ImageUtils::blend(head_screen, screen);
@@ -118,10 +124,12 @@ public:
         int x = d.part(30).x();
         int y = d.part(30).y();
         double z = (d.part(16).x() - d.part(1).x()) / 600.0;
-        double _r = (d.part(30).x() - d.part(28).x()) * 3.14;
+        // double _r = (d.part(30).x() - d.part(28).x()) * 3.14;
+        double rad = -atan2(d.part(28).y() - d.part(9).y(),
+                            d.part(28).x() - d.part(9).x()) - 3.14 / 2.0;
+        double _r = rad * 180 / 3.14;
         ave_r = (ave_r + _r) / 2;
         double r = ave_r;
-        std::cout << d.part(30).x() - d.part(28).x() << std::endl;
 
         int brow_left_x = d.part(20).x();
         int brow_left_y = d.part(20).y();
@@ -144,7 +152,10 @@ public:
         result_image = cv::Mat(temp, crop_rect);
 
         // draw crop rectangle
-        cv::rectangle(temp, crop_rect.tl(), crop_rect.br(), cv::Scalar(255, 0, 0), 10);
+        cv::rectangle(temp,
+                      crop_rect.tl() - cv::Point(1, 1),
+                      crop_rect.br() + cv::Point(1, 1),
+                      cv::Scalar(74, 149, 60), 1);
       }
     }
 
@@ -196,7 +207,6 @@ void init(Local<Object> exports) {
                Nan::New<v8::FunctionTemplate>(draw)->GetFunction());
   exports->Set(Nan::New("save").ToLocalChecked(),
                Nan::New<v8::FunctionTemplate>(save)->GetFunction());
-  // NODE_SET_METHOD(exports, "draw", Method);
 }
 
 NODE_MODULE(addon, init)

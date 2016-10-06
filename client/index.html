@@ -5,6 +5,8 @@
     <title>AbemaFace</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link href="https://fonts.googleapis.com/css?family=Baloo" rel="stylesheet">
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="node_modules/animate.css/animate.min.css">
   </head>
   <body>
     <div class="contents">
@@ -12,8 +14,15 @@
         <canvas id="video" width="1000" height="700"></canvas>
       </div>
     </div>
-    <div class="title-box">
-      <h1>Abema Card Maker</h1>
+    <div class="abema">
+      <img src="assets/abema-head.png" width="200px">
+    </div>
+    <div class="abema-wrapper">
+      <div class="abema-pop arrow_box">
+        <div class="abema-pop-text" id="pop">
+          face 2 abema
+        </div>
+      </div>
     </div>
     <div class="countdown-wrapper">
       <div class="countdown">
@@ -23,23 +32,49 @@
     </div>
     <div class="dialog-wrapper" id="dialog">
       <div class="input-dialog">
-        <h2>Input your info!</h2>
-        <div class="input-column">
-          <label>
-            氏名
-          </label>
-          <input id="name-input">
+        <div>
+          <h2>Input your info</h2>
+          <button id="cancel-button">
+            <i class="fa fa-close"></i>
+          </button>
         </div>
-        <div class="input-column">
-          <label>
-            所属
-          </label>
-          <input id="affiliate-input">
+        <div class="middle">
+          <div>
+            <img id="thumb" width="300" height="300">
+          </div>
+          <div class="inputs">
+            <div class="input-column">
+              <label>
+                苗字
+              </label>
+              <input id="name-input">
+            </div>
+            <div class="input-column">
+              <label>
+                名前
+              </label>
+              <input id="name-input2">
+            </div>
+            <div class="input-column">
+              <label>
+                役職
+              </label>
+              <input id="affiliate-input">
+            </div>
+          </div>
         </div>
         <div class="input-column">
           <button type="submit" id="create-button">
-            作成
+            OK
           </button>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-wrapper" id="confirm-dialog">
+      <div class="printing-dialog">
+        <i class="fa fa-print"></i> Now Printing...
+        <div class="thank">
+          Thank you!
         </div>
       </div>
     </div>
