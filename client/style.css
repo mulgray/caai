@@ -132,14 +132,24 @@ h1, h2 {
   justify-content: center;
   align-items: center;
 
-	transition: all 0.3s;
-
   z-index: 100;
 }
 
-.countdown-wrapper .flush {
-  background-color: white;
-	opacity: 1;
+.flush {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  background-color: rgba(255, 255, 255, 0.5);
+
+	transition: all 100ms;
+  opacity: 0;
+}
+
+.flush-active {
+  opacity: 1;
 }
 
 .countdown {

@@ -3,6 +3,12 @@ var $ = require('jquery');
 var fs = require('fs');
 var exec = require('child_process').exec;
 
+function flush() {
+  var wrapper = $('.flush');
+  wrapper.toggleClass('flush-active');
+  setTimeout(() => wrapper.toggleClass('flush-active'), 100);
+}
+
 function countdown() {
   var wrapper = $('.countdown-wrapper');
   var elem = $('.countdown');
@@ -10,17 +16,23 @@ function countdown() {
   var count = 3;
   var decrement = () => {
     if (count == 0) {
-      elem.text();
+      elem.text('');
+      isEnable = false;
       abema_face.save('abema.png');
-      $('#dialog').toggleClass('shown');
+      flush();
+      setTimeout(() => {
+        $('#dialog').toggleClass('shown');
+      }, 1500);
     } else {
-      count--;
       elem.text(count);
+      count--;
       setTimeout(decrement, 1000);
     }
   };
   decrement();
 }
+
+isEnable = true;
 
 document.addEventListener('DOMContentLoaded', function() {
   var canvas = document.getElementById('video');
@@ -32,7 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var update = function() {
     abema_face.draw(imageData.data, width, height);
     context.putImageData(imageData, 0, 0);
-    setTimeout(update, 1);
+    if (isEnable) {
+      setTimeout(update, 1);
+    }
   };
   update();
 
@@ -49,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     exec('python ../card/make_business_card.py ' + args, (error, stdout, stderr) => {
       $('#dialog').toggleClass('shown');
+      isEnable = true;
+      update();
     });
   });
 });
