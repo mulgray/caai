@@ -3,8 +3,8 @@
     {
       "target_name": "abema_face",
       "sources": ["../abema/abema_face_module.cpp", "../dlib/all/source.cpp"],
-      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)'],
-      'cflags_cc': ['-fexceptions'],
+      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)', '-O3'],
+      'cflags_cc': ['-fexceptions', '-O3'],
       'cflags!': ['-fno-exceptions'],
       'cflags_cc!': ['-fno-exception', '-fno-rtti'],
       "include_dirs": [
@@ -12,13 +12,16 @@
       ],
       "link_settings": {
         "libraries": [
-          "-L<!@(pwd)/../abema/build/dlib_build",
-          "-ldlib",
+          "-lpthread",
+          "-lopenblas",
+          "-llapack",
           "<!@(pkg-config --libs opencv)",
         ]
       },
       "defines": [
-        'DLIB_NO_GUI_SUPPORT'
+        'DLIB_NO_GUI_SUPPORT',
+        'DLIB_USE_BLAS',
+        'DLIB_USE_LAPACK'
       ]
     }
   ]
