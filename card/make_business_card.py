@@ -1,6 +1,7 @@
 # --- coding: utf-8 ---
 from PIL import Image, ImageDraw, ImageFont
 import os
+import datetime
 import sys
 
 """Usage this file.
@@ -54,7 +55,9 @@ for i in range(len(description)):
 
 input_img = Image.open(abs_path('../client/abema.png'), 'r')
 
+file_name = '/home/timeline_x/cards/' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + ".jpg"
+
 canvas.paste(input_img, (int(43 * 4.727), int(250 * 4.727)))
 
-canvas.save(abs_path('img_out.jpg'), 'JPEG', quality=100, optimize=True)
+canvas.save(file_name, 'JPEG', quality=100, optimize=True)
 
