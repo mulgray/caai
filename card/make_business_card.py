@@ -56,6 +56,5 @@ input_img = Image.open(abs_path('../client/abema.png'), 'r')
 
 canvas.paste(input_img, (int(43 * 4.727), int(250 * 4.727)))
 
-canvas_rotate = canvas.transpose(Image.ROTATE_90)
-canvas_rotate.save(abs_path('img_out_rotate.jpg'), 'JPEG', quality=100, optimize=True)
+canvas.save(abs_path('img_out.jpg'), 'JPEG', quality=100, optimize=True)
 
