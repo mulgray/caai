@@ -56,33 +56,27 @@ private:
   int draw_size_top = 0;
 
   void blend_nose(cv::Mat screen, int x , int y, double scale, double rotation) {
-    cv::Mat abema_resized;
-    cv::resize(abema_source, abema_resized, cv::Size(), scale, scale);
-
-    cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
-    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1.0);
-    mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
-    mv.at<double>(1, 2) += y - (abema_resized.rows / 2);
+    cv::Point2d ctr(abema_source.cols * scale / 2, abema_source.rows * scale / 2);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, scale);
+    mv.at<double>(0, 2) += x - abema_source.cols * scale;
+    mv.at<double>(1, 2) += y - abema_source.rows * scale;
 
     cv::Mat nose_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
-    cv::warpAffine(abema_resized, nose_screen, mv, nose_screen.size(),
-                   cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+    cv::warpAffine(abema_source, nose_screen, mv, nose_screen.size(),
+                   cv::INTER_CUBIC, cv::BORDER_TRANSPARENT);
 
     ImageUtils::blend(nose_screen, screen);
   }
 
   void blend_head(cv::Mat screen, int x , int y, double scale, double rotation) {
-    cv::Mat abema_resized;
-    cv::resize(abema_head, abema_resized, cv::Size(), scale, scale);
-    cv::Point2d ctr(abema_resized.cols / 2, abema_resized.rows / 2);
-    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1.0);
-    mv.at<double>(0, 2) += x - (abema_resized.cols / 2);
-    mv.at<double>(1, 2) += y - (abema_resized.rows / 1.25);
+    cv::Point2d ctr(abema_head.cols * scale / 2, abema_head.rows * scale / 2);
+    cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, scale);
+    mv.at<double>(0, 2) += x - abema_head.cols * scale;
+    mv.at<double>(1, 2) += y - abema_head.rows * scale * 1.25;
 
     cv::Mat head_screen(screen.size(), screen.type(), cv::Scalar(0, 0, 0));
-    cv::warpAffine(abema_resized, head_screen, mv, head_screen.size(),
-                   cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
-    draw_size_top = x - (abema_resized.cols / 2);
+    cv::warpAffine(abema_head, head_screen, mv, head_screen.size(),
+                   cv::INTER_CUBIC, cv::BORDER_TRANSPARENT);
 
     ImageUtils::blend(head_screen, screen);
   }
@@ -134,7 +128,7 @@ public:
         int brow_right_x = d.part(25).x();
         int brow_right_y = d.part(25).y();
 
-        blend_nose(temp, x, y, z, r);
+        blend_nose(temp, x, y, z / 5.0, r);
         blend_head(temp,
                    (brow_left_x + brow_right_x) / 2,
                    (brow_left_y + brow_right_y) / 2,
@@ -148,7 +142,6 @@ public:
         cv::Rect bounds(0, 0, temp.size().width, temp.size().height);
         crop_rect = crop_rect & bounds;
         result_image = cv::Mat(temp, crop_rect);
-        cv::resize(result_image, result_image, cv::Size(900, 900), cv::INTER_CUBIC);
 
         // draw crop rectangle
         cv::rectangle(temp, crop_rect.tl(), crop_rect.br(), cv::Scalar(255, 0, 0), 10);
@@ -173,6 +166,7 @@ public:
   }
 
   void save(std::string filename) {
+    cv::resize(result_image, result_image, cv::Size(900, 900), cv::INTER_CUBIC);
     cv::imwrite(filename, result_image);
   }
 };
