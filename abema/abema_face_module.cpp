@@ -135,9 +135,9 @@ public:
                    z / 2.0, r);
 
         // crop face around area
-        double crop_size = 1200 * z;
+        double crop_size = 1500 * z;
         cv::Rect crop_rect(x - crop_size / 2,
-                           y - crop_size / 2 - crop_size / 3,
+                           y - crop_size / 2 - crop_size / 5,
                            crop_size, crop_size);
         cv::Rect bounds(0, 0, temp.size().width, temp.size().height);
         crop_rect = crop_rect & bounds;
