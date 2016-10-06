@@ -3,8 +3,9 @@
     {
       "target_name": "abema_face",
       "sources": ["../abema/abema_face_module.cpp", "../dlib/all/source.cpp"],
-      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)', '-O3'],
-      'cflags_cc': ['-fexceptions', '-O3'],
+      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)', '-O3', '-frtti'],
+      'cflags_cc': ['-fexceptions', '-O3', '-frtti'],
+      'cflags_cc+': ['-frtti'],
       'cflags!': ['-fno-exceptions'],
       'cflags_cc!': ['-fno-exception', '-fno-rtti'],
       "include_dirs": [
