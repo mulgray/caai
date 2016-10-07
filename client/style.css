@@ -124,6 +124,11 @@ h2 {
   cursor: pointer;
 }
 
+.input-dialog #create-button:hover {
+  color: white;
+  background-color: darkgreen;
+}
+
 .input-dialog #cancel-button {
   cursor: pointer;
   padding: 12px;

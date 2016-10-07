@@ -3,6 +3,9 @@ var $ = require('jquery');
 var fs = require('fs');
 var exec = require('child_process').exec;
 
+var audio = new Audio('assets/camera.mp3');
+audio.preload = 'auto';
+
 $.fn.extend({
     animateCss: function (animationName) {
         var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
@@ -13,6 +16,7 @@ $.fn.extend({
 });
 
 function flush() {
+  audio.play();
   var wrapper = $('.flush');
   wrapper.css('z-index', 1000);
   wrapper.toggleClass('flush-active');
@@ -105,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         name = $('#name-input').val('');
         name2 = $('#name-input2').val('');
         affiliate = $('#affiliate-input').val('');
-      }, 3000);
+      }, 8000);
     });
   });
 });
