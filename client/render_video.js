@@ -1,4 +1,4 @@
-var abema_face = require('./build/Release/abema_face');
+var abema_face = require('../build/Release/face2abema');
 var $ = require('jquery');
 var fs = require('fs');
 var exec = require('child_process').exec;

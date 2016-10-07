@@ -1,12 +1,11 @@
 {
   "targets": [
     {
-      "target_name": "abema_face",
-      "sources": ["../abema/abema_face_module.cpp", "../dlib/all/source.cpp"],
-      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)', '-O3', '-frtti'],
-      'cflags_cc': ['-fexceptions', '-O3', '-frtti'],
-      'cflags_cc+': ['-frtti'],
-      'cflags!': ['-fno-exceptions'],
+      "target_name": "face2abema",
+      "sources": ["addons/abema_face_module.cpp", "addons/dlib/all/source.cpp"],
+      'cflags': ['-fexceptions', '<!@(pkg-config --cflags opencv)'],
+      'cflags_cc': ['-fexceptions', '<!@(pkg-config --cflags opencv)'],
+      'cflags!': ['-fno-exceptions', '-fno-rtti'],
       'cflags_cc!': ['-fno-exception', '-fno-rtti'],
       "include_dirs": [
         "<!(node -e \"require('nan')\")"
@@ -16,7 +15,7 @@
           "-lpthread",
           "-lopenblas",
           "-llapack",
-          "<!@(pkg-config --libs opencv)",
+          "<!@(pkg-config --libs opencv)"
         ]
       },
       "defines": [

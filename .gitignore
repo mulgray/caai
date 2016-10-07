@@ -1,7 +1,6 @@
 *~
 *.out
+*.log
 
-/abema/build
-
-/client/node_modules
-/client/build
+/node_modules
+/build

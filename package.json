@@ -1,10 +1,10 @@
 {
-  "name": "caai",
-  "version": "0.0.1",
+  "name": "face2abema",
+  "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "client/main.js",
   "scripts": {
-    "build": "./build.sh",
+    "build": "HOME=~/.electron-gyp ./node_modules/.bin/node-gyp rebuild --target=`electron -v` --arch=x64 --dist-url=https://atom.io/download/atom-shell",
     "start": "electron ."
   },
   "repository": {

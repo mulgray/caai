@@ -9,11 +9,11 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "../dlib/opencv.h"
-#include "../dlib/image_io.h"
-#include "../dlib/image_transforms.h"
-#include "../dlib/image_processing.h"
-#include "../dlib/image_processing/frontal_face_detector.h"
+#include "dlib/opencv.h"
+#include "dlib/image_io.h"
+#include "dlib/image_transforms.h"
+#include "dlib/image_processing.h"
+#include "dlib/image_processing/frontal_face_detector.h"
 
 #include "image_utils.hpp"
 
