@@ -25,13 +25,15 @@ def abs_path(filepath):
 canvas = Image.new('RGB', (1300, 2150), (255, 255, 255))
 draw = ImageDraw.Draw(canvas)
 
-# フォントの種類とサイズを指定
-font = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(25 * 4.727))
-font2 = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(8 * 4.727))
-
 familyName = sys.argv[1]
 firstName = sys.argv[2]
 description = sys.argv[3]
+
+
+
+# フォントの種類とサイズを指定
+font = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(25 * 4.727))
+font2 = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(8 * 4.727))
 
 if sys.version_info < (3, 0, 0):
   familyName = sys.argv[1].decode('utf-8')
@@ -39,7 +41,7 @@ if sys.version_info < (3, 0, 0):
   description = sys.argv[3].decode('utf-8')
 
 # テキストを書き込み. 引数は順に, 書き込み座標, テキスト, テキストのフォント, テキストのカラー
-y, dy, dyy = 30 * 4.727, 30 * 4.727, 20 * 4.727
+y, dy, dyy = 3 * 4.727, 30 * 4.727, 20 * 4.727
 for i in range(len(familyName)):
     y += dy
     draw.text((125 * 4.727, y), familyName[i], font=font, fill='black')
@@ -51,7 +53,10 @@ for i in range(len(firstName)):
 y, dy = 15 * 4.727, 10 * 4.727
 for i in range(len(description)):
     y += dy
-    draw.text((165 * 4.727, y), description[i], font=font2, fill='black')
+    s = description[i]
+    if s == "ー":
+        s = " |"
+    draw.text((165 * 4.727, y), s, font=font2, fill='black')
 
 input_img = Image.open(abs_path('../client/abema.png'), 'r')
 
