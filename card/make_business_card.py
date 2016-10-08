@@ -30,8 +30,9 @@ firstName = sys.argv[2]
 description = sys.argv[3]
 
 # フォントの種類とサイズを指定
-font = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(25 * 4.727))
-font2 = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(8 * 4.727))
+font_path = 'fonts/GenShinGothic-P-Medium.ttf';
+font = ImageFont.truetype(abs_path(font_path), int(25 * 4.727))
+font2 = ImageFont.truetype(abs_path(font_path), int(8 * 4.727))
 
 if sys.version_info < (3, 0, 0):
   familyName = sys.argv[1].decode('utf-8')
@@ -52,11 +53,11 @@ y, dy = 15 * 4.727, 10 * 4.727
 for i in range(len(description)):
     y += dy
     s = description[i]
-    if s == "ー":
-        s = " |"
+    if s == u"ー":
+        s = u" |"
     draw.text((165 * 4.727, y), s, font=font2, fill='black')
 
-input_img = Image.open(abs_path('../client/abema.png'), 'r')
+input_img = Image.open(abs_path('../abema.png'), 'r')
 
 file_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + ".jpg"
 
