@@ -2,38 +2,38 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>AbemaFace</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link href="https://fonts.googleapis.com/css?family=Baloo" rel="stylesheet">
-    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
+    <title>Face2Abema</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Baloo">
     <link rel="stylesheet" href="../node_modules/animate.css/animate.min.css">
+    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
   </head>
   <body>
     <div class="contents">
-      <div class="center-box">
-        <canvas id="video" width="1200" height="900"></canvas>
-      </div>
+      <canvas id="video" width="800" height="600"></canvas>
     </div>
-    <div class="abema">
+
+    <!-- SideAbema -->
+    <div class="side-abema">
       <img src="../assets/abema-head.png" width="200px">
     </div>
-    <div class="abema-wrapper">
-      <div class="abema-pop arrow_box">
-        <div class="abema-pop-text" id="pop">
+    <div class="side-abema-pop">
+      <div class="arrow-box">
+        <div class="abema-pop-text" id="pop-text">
           face 2 abema
         </div>
       </div>
     </div>
-    <div class="countdown-wrapper">
-      <div class="countdown">
-      </div>
-    </div>
+
+    <!-- Flush -->
     <div class="flush">
     </div>
-    <div class="dialog-wrapper" id="dialog">
+
+    <!-- InputDialog -->
+    <div class="dialog-wrapper" id="input-dialog">
       <div class="input-dialog">
         <div>
-          <h2>Input your info</h2>
+          <span>Input your info</span>
           <button id="cancel-button">
             <i class="fa fa-close"></i>
           </button>
@@ -47,19 +47,19 @@
               <label>
                 苗字
               </label>
-              <input id="name-input">
+              <input id="family-name-input">
             </div>
             <div class="input-column">
               <label>
                 名前
               </label>
-              <input id="name-input2">
+              <input id="first-name-input">
             </div>
             <div class="input-column">
               <label>
                 役職
               </label>
-              <input id="affiliate-input">
+              <input id="job-position-input">
             </div>
           </div>
         </div>
@@ -70,14 +70,17 @@
         </div>
       </div>
     </div>
-    <div class="dialog-wrapper" id="confirm-dialog">
-      <div class="printing-dialog">
+
+    <!-- ThanksDialog -->
+    <div class="dialog-wrapper" id="thanks-dialog">
+      <div class="thanks-dialog">
         <i class="fa fa-print"></i> Now Printing...
         <div class="thank">
           Thank you!
         </div>
       </div>
     </div>
-    <script src="render_video.js"></script>
+
+    <script src="renderer.js"></script>
   </body>
 </html>

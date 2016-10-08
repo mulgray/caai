@@ -29,8 +29,6 @@ familyName = sys.argv[1]
 firstName = sys.argv[2]
 description = sys.argv[3]
 
-
-
 # フォントの種類とサイズを指定
 font = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(25 * 4.727))
 font2 = ImageFont.truetype(abs_path('fonts/hiragino.otf'), int(8 * 4.727))
@@ -60,7 +58,7 @@ for i in range(len(description)):
 
 input_img = Image.open(abs_path('../client/abema.png'), 'r')
 
-file_name = '/home/timeline_x/cards/' + datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + ".jpg"
+file_name = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') + ".jpg"
 
 canvas.paste(input_img, (int(43 * 4.727), int(250 * 4.727)))
 
