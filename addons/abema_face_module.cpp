@@ -21,44 +21,19 @@ using namespace dlib;
 using namespace std;
 using namespace v8;
 
-class Profiler {
-private:
-  static std::string tag;
-  static long start_tick;
-
-public:
-  static void start(std::string tag) {
-    Profiler::tag = tag;
-    start_tick = cv::getTickCount();
-  }
-
-  static void stop() {
-    long end_tick = cv::getTickCount();
-    double tick = (end_tick - start_tick) * 1000 / cv::getTickFrequency();
-    std::cout << "PROFILER(" << tag << "): " << tick << " ms" << std::endl;
-  }
-};
-
-std::string Profiler::tag;
-long Profiler::start_tick;
-
 class AbemaFace {
 private:
   frontal_face_detector detector;
   shape_predictor pose_model;
   cv::VideoCapture cap;
 
-  cv::Mat abema_source;
+  cv::Mat abema_nose;
   cv::Mat abema_head;
-
   cv::Mat result_image;
-
-  double ave_r = 0;
-  int draw_size_top = 0;
 
   void blend_nose(cv::Mat screen, int x , int y, double scale, double rotation) {
     cv::Mat abema_scaled;
-    cv::resize(abema_source, abema_scaled, cv::Size(), scale, scale, cv::INTER_CUBIC);
+    cv::resize(abema_nose, abema_scaled, cv::Size(), scale, scale, cv::INTER_CUBIC);
     cv::Point2d ctr(abema_scaled.cols / 2, abema_scaled.rows / 2);
     cv::Mat mv = cv::getRotationMatrix2D(ctr, rotation, 1);
     mv.at<double>(0, 2) += x - abema_scaled.cols / 2;
@@ -90,13 +65,15 @@ private:
 public:
   void init() {
     detector = get_frontal_face_detector();
+
     cap = cv::VideoCapture(0);
     if (!cap.isOpened()) {
       cerr << "Unable to connect to camera" << endl;
       return;
     }
+
     deserialize("assets/shape_predictor_68_face_landmarks.dat") >> pose_model;
-    abema_source = cv::imread("assets/abema-nose.png", -1);
+    abema_nose = cv::imread("assets/abema-nose.png", -1);
     abema_head = cv::imread("assets/abema-head.png", -1);
   }
 
@@ -118,18 +95,13 @@ public:
 
     if (shapes.size() > 0) {
       for (unsigned long i = 0; i < shapes.size(); ++i) {
-        const full_object_detection& d = shapes[0];
-        // x, y: position of a nose
-        // z: projected ear to ear distance of the face
+        const full_object_detection& d = shapes[i];
         int x = d.part(30).x();
         int y = d.part(30).y();
         double z = (d.part(16).x() - d.part(1).x()) / 600.0;
-        // double _r = (d.part(30).x() - d.part(28).x()) * 3.14;
         double rad = -atan2(d.part(28).y() - d.part(9).y(),
                             d.part(28).x() - d.part(9).x()) - 3.14 / 2.0;
-        double _r = rad * 180 / 3.14;
-        ave_r = (ave_r + _r) / 2;
-        double r = ave_r;
+        double r = rad * 180 / 3.14;
 
         int brow_left_x = d.part(20).x();
         int brow_left_y = d.part(20).y();
